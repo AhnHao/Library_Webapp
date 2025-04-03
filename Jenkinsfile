@@ -17,7 +17,7 @@ pipeline {
             steps {
                 // Sử dụng Jenkins Credentials để tạo file .env an toàn
                 withCredentials([
-                    string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
                 ]) {
                     sh '''
                     echo "Creating .env file..."
