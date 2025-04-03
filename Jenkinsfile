@@ -37,21 +37,14 @@ pipeline {
             }
         }
         
-        stage('Stop Running Containers') {
+        stage('Build and Deploy') {
             steps {
-                sh 'docker-compose down || true'
-            }
-        }
-        
-        stage('Build Docker Images') {
-            steps {
-                sh 'docker-compose build'
-            }
-        }
-        
-        stage('Deploy Application') {
-            steps {
-                sh 'docker-compose up -d'
+                script {
+                    // Sử dụng Docker trực tiếp thay vì Docker Compose
+                    sh 'docker compose down || true'
+                    sh 'docker compose build'
+                    sh 'docker compose up -d'
+                }
             }
         }
         
