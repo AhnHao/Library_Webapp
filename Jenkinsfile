@@ -84,7 +84,7 @@ pipeline {
             echo 'Deployment completed successfully!'
         }
         failure {
-            echo 'Deployment failed!''
+            echo 'Deployment failed!'
         }
         always {
             sh 'rm -f temp_files || true'
