@@ -7,12 +7,6 @@ pipeline {
     }
     
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/AhnHao/Library_Webapp.git']])
-            }
-        }
-        
         stage('Create .env file') {
             steps {
                 // Sử dụng Jenkins Credentials để tạo file .env an toàn
