@@ -41,9 +41,9 @@ pipeline {
             steps {
                 script {
                     // Sử dụng Docker trực tiếp thay vì Docker Compose
-                    sh 'docker compose down || true'
-                    sh 'docker compose build'
-                    sh 'docker compose up -d'
+                    sh 'docker-compose down || true'
+                    sh 'docker-compose build'
+                    sh 'docker-compose up -d'
                 }
             }
         }
