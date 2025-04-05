@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-	baseURL: "http://backend:3000/api",
+  baseURL: "api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -44,16 +44,16 @@ export default {
 
   // Publisher APIs
   getAllPublishers() {
-    return api.get("/publisher");
+    return api.get("/publishers");
   },
   createPublisher(data) {
-    return api.post("/publisher", data);
+    return api.post("/publishers", data);
   },
   updatePublisher(id, data) {
-    return api.put(`/publisher/${id}`, data);
+    return api.put(`/publishers/${id}`, data);
   },
   deletePublisher(id) {
-    return api.delete(`/publisher/${id}`);
+    return api.delete(`/publishers/${id}`);
   },
   searchPublishers(keyword) {
     return api.get(`/publishers/search?keyword=${keyword}`);

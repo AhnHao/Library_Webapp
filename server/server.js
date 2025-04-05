@@ -25,7 +25,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/readers", readerRoutes);
 app.use("/api/books", bookRoutes);
-app.use("/api/publisher", publisherRoutes);
+app.use("/api/publishers", publisherRoutes);
 app.use("/api/borrow-requests", borrowRequestRoutes);
 
 // Error handling middleware
