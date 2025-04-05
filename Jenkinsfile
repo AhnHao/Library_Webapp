@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    MONGO_URI = credentials('mongo_uri')
-    JWT_SECRET = credentials('jwt_secret')
+    MONGO_URI = credentials('MONGO_URI')
+    JWT_SECRET = credentials('JWT_SECRET')
   }
 
   stages {
