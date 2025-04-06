@@ -2,7 +2,8 @@
 
 ![Library Webapp](https://png.pngtree.com/element_our/20190522/ourmid/pngtree-library-logo-image_1071984.jpg)
 
-Hệ thống quản lý thư viện hiện đại giúp tự động hóa các quy trình mượn trả sách và quản lý tài liệu.
+Hệ thống quản lý thư viện hiện đại giúp tự động hóa các quy trình mượn trả sách và quản lý tài liệu. 
+Lưu ý: Trong hệ thống sẽ có một số tính năng để cho người dùng trải nghiệm trong thực tế sẽ không có hoặc được cài đặt đặc biệt (Vd: đăng ký tài khoản dành cho nhân viên,..)
 
 ## Tính năng chính
 
