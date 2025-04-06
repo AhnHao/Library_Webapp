@@ -43,8 +43,9 @@ app.use((err, req, res, next) => {
     body: req.body,
   });
 
-  res.status(500).json({
-    message: "Đã xảy ra lỗi!",
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Đã xảy ra lỗi!",
     error:
       process.env.NODE_ENV === "development"
         ? {

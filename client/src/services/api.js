@@ -54,7 +54,24 @@ api.interceptors.response.use(
 export default {
   // Auth APIs
   login(credentials) {
-    return api.post("/auth/login", credentials);
+    console.log("Sending login request:", credentials);
+    return api
+      .post("/auth/login", credentials)
+      .then((response) => {
+        console.log("Login response:", response.data);
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+        }
+        return response.data;
+      })
+      .catch((error) => {
+        console.error("Login error:", {
+          status: error.response?.status,
+          message: error.response?.data?.message || "Lỗi không xác định",
+          data: error.response?.data,
+        });
+        throw error;
+      });
   },
   register(userData) {
     console.log("Registration data:", userData);

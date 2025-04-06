@@ -15,8 +15,7 @@ exports.registerStaff = async (req, res) => {
 
     if (existingStaff || existingReader) {
       return res.status(400).json({
-        message:
-          "Số điện thoại đã được sử dụng để đăng ký tài khoản" 
+        message: "Số điện thoại đã được sử dụng để đăng ký tài khoản",
       });
     }
 
@@ -60,8 +59,7 @@ exports.registerReader = async (req, res) => {
 
     if (existingStaff || existingReader) {
       return res.status(400).json({
-        message:
-          "Số điện thoại đã được sử dụng để đăng ký tài khoản"
+        message: "Số điện thoại đã được sử dụng để đăng ký tài khoản",
       });
     }
 
@@ -100,6 +98,15 @@ exports.login = async (req, res) => {
   try {
     const { SoDienThoai, Password } = req.body;
 
+    // Log để debug
+    console.log("Login attempt:", { SoDienThoai });
+
+    if (!SoDienThoai || !Password) {
+      return res.status(400).json({
+        message: "Vui lòng nhập số điện thoại và mật khẩu",
+      });
+    }
+
     // Kiểm tra trong bảng Staff
     let user = await Staff.findOne({ SoDienThoai });
     let isStaff = true;
@@ -110,13 +117,26 @@ exports.login = async (req, res) => {
       isStaff = false;
     }
 
+    // Log để debug
+    console.log("User found:", { found: !!user, isStaff });
+
     if (!user) {
-      return res.status(401).json({ message: "Số điện thoại không tồn tại" });
+      return res.status(401).json({
+        success: false,
+        message: "Số điện thoại không tồn tại",
+      });
     }
 
     const isValidPassword = await bcrypt.compare(Password, user.Password);
+
+    // Log để debug
+    console.log("Password validation:", { isValid: isValidPassword });
+
     if (!isValidPassword) {
-      return res.status(401).json({ message: "Mật khẩu không đúng" });
+      return res.status(401).json({
+        success: false,
+        message: "Mật khẩu không đúng",
+      });
     }
 
     // Tạo JWT token
@@ -130,7 +150,9 @@ exports.login = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRE }
     );
 
-    res.json({
+    // Trả về response thành công
+    return res.status(200).json({
+      success: true,
       token,
       role: isStaff ? "staff" : "reader",
       user: {
@@ -141,7 +163,12 @@ exports.login = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error: error.message });
+    console.error("Login error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+      error: error.message,
+    });
   }
 };
 
