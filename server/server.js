@@ -35,10 +35,23 @@ app.get("/api/health", (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send({
+  console.error("Error details:", {
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+    body: req.body,
+  });
+
+  res.status(500).json({
     message: "Đã xảy ra lỗi!",
-    error: process.env.NODE_ENV === "development" ? err : {},
+    error:
+      process.env.NODE_ENV === "development"
+        ? {
+            message: err.message,
+            stack: err.stack,
+          }
+        : {},
   });
 });
 

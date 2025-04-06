@@ -57,11 +57,19 @@ export default {
     return api.post("/auth/login", credentials);
   },
   register(userData) {
-    // Thêm route dựa vào isStaff
+    console.log("Registration data:", userData);
     const endpoint = userData.isStaff
       ? "/auth/register/staff"
       : "/auth/register/reader";
-    return api.post(endpoint, userData);
+    console.log("Using endpoint:", endpoint);
+    return api.post(endpoint, userData).catch((error) => {
+      console.error("Registration error details:", {
+        response: error.response?.data,
+        status: error.response?.status,
+        message: error.message,
+      });
+      throw error;
+    });
   },
 
   // Publisher APIs
