@@ -28,6 +28,11 @@ app.use("/api/books", bookRoutes);
 app.use("/api/publishers", publisherRoutes);
 app.use("/api/borrow-requests", borrowRequestRoutes);
 
+// Thêm route test
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -39,7 +44,12 @@ app.use((err, req, res, next) => {
 
 // Handle 404
 app.use((req, res) => {
-  res.status(404).send({ message: "Route không tồn tại!" });
+  console.log(`404 Not Found: ${req.method} ${req.url}`);
+  res.status(404).json({
+    message: "Route không tồn tại!",
+    path: req.url,
+    method: req.method,
+  });
 });
 
 const PORT = process.env.PORT || 3000;
