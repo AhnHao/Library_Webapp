@@ -1,0 +1,25 @@
+# Node modules
+node_modules
+npm-debug.log
+.vite
+.cache
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+
+# Mac / Linux / Windows files
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*.local
+
+# Tests & Dev tools
+coverage
+tests
+cypress
