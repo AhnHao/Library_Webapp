@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "/api", // Đảm bảo baseURL đúng
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -57,7 +57,11 @@ export default {
     return api.post("/auth/login", credentials);
   },
   register(userData) {
-    return api.post("/auth/register", userData);
+    // Thêm route dựa vào isStaff
+    const endpoint = userData.isStaff
+      ? "/auth/register/staff"
+      : "/auth/register/reader";
+    return api.post(endpoint, userData);
   },
 
   // Publisher APIs

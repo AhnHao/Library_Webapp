@@ -159,7 +159,13 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        await api.register(this.formData);
+        // Thêm trường isStaff vào formData
+        const registerData = {
+          ...this.formData,
+          isStaff: this.isStaff,
+        };
+
+        await api.register(registerData);
         this.$notify({
           type: "success",
           title: "Đăng ký thành công",
