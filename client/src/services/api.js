@@ -1,10 +1,13 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: "/api", // Đảm bảo baseURL đúng
   headers: {
     "Content-Type": "application/json",
   },
+  // Thêm timeout và retry
+  timeout: 5000,
+  retry: 3,
 });
 
 // Thêm interceptor để tự động gắn token vào header
@@ -21,10 +24,25 @@ api.interceptors.request.use(
   }
 );
 
+// Thêm log để debug
+api.interceptors.request.use((request) => {
+  console.log("Starting Request:", request.method, request.url);
+  return request;
+});
+
 // Thêm interceptor để xử lý lỗi
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log("Response:", response.status, response.config.url);
+    return response;
+  },
   (error) => {
+    console.error("API Error:", {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       window.location.href = "/login";
