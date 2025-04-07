@@ -213,19 +213,35 @@ export default {
     async approveRequest(requestId) {
       try {
         await api.approveRequest(requestId);
-        alert("Đã duyệt yêu cầu mượn sách");
+        this.$notify({
+          type: "success",
+          title: "Thành công",
+          message: "Đã duyệt yêu cầu mượn sách",
+        });
         await this.loadData();
       } catch (error) {
-        alert(error.response?.data?.message || "Đã có lỗi xảy ra");
+        this.$notify({
+          type: "error",
+          title: "Thất bại",
+          message: error.response?.data?.message || "Không thể duyệt yêu cầu",
+        });
       }
     },
     async rejectRequest(requestId) {
       try {
         await api.rejectRequest(requestId);
-        alert("Đã từ chối yêu cầu mượn sách");
+        this.$notify({
+          type: "success",
+          title: "Thành công",
+          message: "Đã từ chối yêu cầu mượn sách",
+        });
         await this.loadData();
       } catch (error) {
-        alert(error.response?.data?.message || "Đã có lỗi xảy ra");
+        this.$notify({
+          type: "error",
+          title: "Thất bại",
+          message: error.response?.data?.message || "Không thể từ chối yêu cầu",
+        });
       }
     },
     async handleApprove(requestId) {

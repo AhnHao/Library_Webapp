@@ -50,6 +50,10 @@
                 <span>Năm XB: {{ book.NamXB }}</span>
               </div>
               <div class="detail-item">
+                <i class="bi bi-box-seam me-2"></i>
+                <span>Còn lại: {{ book.SoQuyen || "Không xác định" }}</span>
+              </div>
+              <div class="detail-item">
                 <i class="bi bi-cash me-2"></i>
                 <span>Giá: {{ formatCurrency(book.DonGia) }}</span>
               </div>

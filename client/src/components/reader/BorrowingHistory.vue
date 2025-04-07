@@ -209,11 +209,18 @@ export default {
     async returnBook(requestId) {
       try {
         await api.returnBook(requestId);
-        alert("Đã trả sách thành công");
+        this.$notify({
+          type: "success",
+          title: "Thành công",
+          message: "Sách đã được trả thành công",
+        });
         await this.loadData();
       } catch (error) {
-        console.error("Lỗi khi trả sách:", error);
-        alert(error.response?.data?.message || "Không thể trả sách");
+        this.$notify({
+          type: "error",
+          title: "Thất bại",
+          message: error.response?.data?.message || "Không thể trả sách",
+        });
       }
     },
   },
