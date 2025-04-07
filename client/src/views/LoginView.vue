@@ -84,11 +84,9 @@ export default {
       this.loading = true;
       try {
         const response = await api.login(this.formData);
+        console.log("Login response in component:", response);
 
-        // Lưu thông tin đăng nhập
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userRole", response.data.role);
-        localStorage.setItem("userData", JSON.stringify(response.data.user));
+        // Lưu thông tin đăng nhập (đã được xử lý trong api.login)
 
         // Hiển thị thông báo thành công
         this.$notify({
@@ -97,13 +95,24 @@ export default {
           message: "Chào mừng bạn quay trở lại!",
         });
 
+        // Chuyển hướng ngay lập tức dựa vào role
+        const role = localStorage.getItem("userRole");
+        console.log("User role:", role);
+
         // Chuyển hướng sau khi thông báo được hiển thị
         setTimeout(() => {
-          this.$router.push(
-            response.data.role === "staff" ? "/staff" : "/reader"
-          );
+          if (role === "staff") {
+            this.$router.push("/staff");
+          } else if (role === "reader") {
+            this.$router.push("/reader");
+          } else {
+            console.error("Invalid role:", role);
+            throw new Error("Invalid role");
+          }
         }, 500);
       } catch (error) {
+        console.error("Login error in component:", error); // Thêm log để debug
+
         // Hiển thị thông báo lỗi
         this.$notify({
           type: "error",

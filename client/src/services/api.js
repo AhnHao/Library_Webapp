@@ -61,6 +61,8 @@ export default {
         console.log("Login response:", response.data);
         if (response.data.token) {
           localStorage.setItem("token", response.data.token);
+          localStorage.setItem("userRole", response.data.role);
+          localStorage.setItem("userData", JSON.stringify(response.data.user));
         }
         return response.data;
       })
@@ -73,6 +75,7 @@ export default {
         throw error;
       });
   },
+
   register(userData) {
     console.log("Registration data:", userData);
     const endpoint = userData.isStaff
