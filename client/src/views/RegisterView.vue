@@ -159,11 +159,26 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        // Thêm trường isStaff vào formData
-        const registerData = {
-          ...this.formData,
-          isStaff: this.isStaff,
-        };
+        let registerData;
+        if (this.isStaff) {
+          registerData = {
+            HoTenNV: this.formData.HoTen,
+            SoDienThoai: this.formData.SoDienThoai,
+            Password: this.formData.Password,
+            DiaChi: this.formData.DiaChi,
+            ChucVu: this.formData.ChucVu,
+            isStaff: true,
+          };
+        } else {
+          registerData = {
+            HoTen: this.formData.HoTen,
+            SoDienThoai: this.formData.SoDienThoai,
+            Password: this.formData.Password,
+            DiaChi: this.formData.DiaChi,
+            NgaySinh: this.formData.NgaySinh,
+            isStaff: false,
+          };
+        }
 
         await api.register(registerData);
         this.$notify({
@@ -185,6 +200,7 @@ export default {
   },
   watch: {
     isStaff() {
+      // Reset form khi chuyển đổi loại tài khoản
       this.formData = {
         HoTen: "",
         SoDienThoai: "",
