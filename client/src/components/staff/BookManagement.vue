@@ -13,7 +13,7 @@
       <div class="row">
         <div class="col-md-6">
           <div class="search-box">
-            <i class="bi bi-search search-icon"></i>
+            <i class="bi bi-search search-icon pe-3"></i>
             <input
               type="text"
               class="form-control search-input"
@@ -470,7 +470,7 @@ export default {
 }
 
 .search-input {
-  padding-left: 2.75rem;
+  padding-left: 2.75rem !important;
   height: 3rem;
   border-radius: 0.5rem;
   border: 1px solid #e2e8f0;
@@ -505,18 +505,18 @@ export default {
 }
 
 /* Modal styles */
-::v-deep .modal-content {
+:deep(.modal-content) {
   border-radius: 1rem;
   border: none;
 }
 
-::v-deep .modal-header {
+:deep(.modal-header) {
   background-color: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
   padding: 1.5rem;
 }
 
-::v-deep .modal-body {
+:deep(.modal-body) {
   padding: 1.5rem;
 }
 

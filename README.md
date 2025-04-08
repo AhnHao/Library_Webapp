@@ -1,8 +1,8 @@
 # Library Webapp System
 
-![Library Webapp](https://png.pngtree.com/element_our/20190522/ourmid/pngtree-library-logo-image_1071984.jpg)
+![Library Webapp](https://cdn-icons-png.flaticon.com/512/8074/8074804.png)
 
-Hệ thống quản lý thư viện hiện đại giúp tự động hóa các quy trình mượn trả sách và quản lý tài liệu. 
+Hệ thống quản lý thư viện hiện đại giúp tự động hóa các quy trình mượn trả sách và quản lý tài liệu.  
 Lưu ý: Trong hệ thống sẽ có một số tính năng để cho người dùng trải nghiệm trong thực tế sẽ không có hoặc được cài đặt đặc biệt (Vd: đăng ký tài khoản dành cho nhân viên,..)
 
 ## Tính năng chính
@@ -67,19 +67,26 @@ cd Library_Webapp
 
 2. Cài đặt dependencies:
 
-# Install backend dependencies
+Install backend dependencies
 
+```terminal
 cd server
 npm install
+```
 
-# Install frontend dependencies
+Install frontend dependencies
 
+```terminal
 cd ../client
 npm install
+```
 
 3. Cấu hình biến môi trường:
+
+```terminal
    cd ../server
    vi .env
+```
 
 ```vim
 PORT=your_port

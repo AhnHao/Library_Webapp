@@ -107,12 +107,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="history in borrowingHistory" :key="history._id">
+            <tr v-for="history in paginatedHistory" :key="history._id">
               <td>{{ history.MaDocGia?.HoTen }}</td>
               <td>{{ history.MaSach?.TenSach }}</td>
               <td>{{ history.MaSach?.MaSach }}</td>
-              <td>{{ formatDate(history.NgayMuon) }}</td>
-              <td>{{ formatDate(history.NgayTra) }}</td>
+              <td>{{ formatDate(history.NgayMuon) || "/" }}</td>
+              <td>{{ formatDate(history.NgayTra) || "/" }}</td>
               <td>
                 <span
                   class="badge"
@@ -122,13 +122,79 @@
                 </span>
               </td>
             </tr>
-            <tr v-if="borrowingHistory.length === 0">
+            <tr v-if="sortedHistory.length === 0">
               <td colspan="6" class="text-center">
                 Không có lịch sử mượn sách
               </td>
             </tr>
           </tbody>
         </table>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="pagination-info">
+              Hiển thị {{ startIndex + 1 }}-{{ endIndex }} trong số
+              {{ totalItems }} mục
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <select
+                v-model="itemsPerPage"
+                class="form-select form-select-sm"
+                @change="handlePageChange(1)"
+              >
+                <option :value="10">10 mục/trang</option>
+                <option :value="20">20 mục/trang</option>
+                <option :value="50">50 mục/trang</option>
+              </select>
+              <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                  <li
+                    class="page-item"
+                    :class="{ disabled: currentPage === 1 }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="handlePageChange(currentPage - 1)"
+                    >
+                      <i class="bi bi-chevron-left"></i>
+                    </a>
+                  </li>
+                  <li
+                    v-for="page in displayedPages"
+                    :key="page"
+                    class="page-item"
+                    :class="{
+                      active: currentPage === page,
+                      disabled: page === '...',
+                    }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="handlePageChange(page)"
+                    >
+                      {{ page }}
+                    </a>
+                  </li>
+                  <li
+                    class="page-item"
+                    :class="{ disabled: currentPage === totalPages }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="handlePageChange(currentPage + 1)"
+                    >
+                      <i class="bi bi-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -145,6 +211,8 @@ export default {
       pendingRequests: [],
       borrowingHistory: [],
       searchKeyword: "",
+      currentPage: 1,
+      itemsPerPage: 10,
     };
   },
   async mounted() {
@@ -174,6 +242,72 @@ export default {
         return readerName.includes(keyword) || bookName.includes(keyword);
       });
     },
+    sortedHistory() {
+      return [...this.borrowingHistory].sort((a, b) => {
+        const dateA = new Date(a.NgayMuon || a.NgayYeuCau);
+        const dateB = new Date(b.NgayMuon || b.NgayYeuCau);
+        return dateB - dateA;
+      });
+    },
+    filteredHistory() {
+      const keyword = this.searchKeyword.toLowerCase().trim();
+      if (!keyword) return this.sortedHistory;
+
+      return this.sortedHistory.filter((item) => {
+        const readerName = item.MaDocGia?.HoTen?.toLowerCase() || "";
+        const bookName = item.MaSach?.TenSach?.toLowerCase() || "";
+        return readerName.includes(keyword) || bookName.includes(keyword);
+      });
+    },
+    totalItems() {
+      return this.filteredHistory.length;
+    },
+    totalPages() {
+      return Math.ceil(this.totalItems / this.itemsPerPage);
+    },
+    startIndex() {
+      return (this.currentPage - 1) * this.itemsPerPage;
+    },
+    endIndex() {
+      return Math.min(this.startIndex + this.itemsPerPage, this.totalItems);
+    },
+    paginatedHistory() {
+      return this.filteredHistory.slice(this.startIndex, this.endIndex);
+    },
+    displayedPages() {
+      const delta = 2;
+      const range = [];
+      const rangeWithDots = [];
+      let l;
+
+      range.push(1);
+
+      for (
+        let i = this.currentPage - delta;
+        i <= this.currentPage + delta;
+        i++
+      ) {
+        if (i < this.totalPages && i > 1) {
+          range.push(i);
+        }
+      }
+
+      range.push(this.totalPages);
+
+      for (let i of range) {
+        if (l) {
+          if (i - l === 2) {
+            rangeWithDots.push(l + 1);
+          } else if (i - l !== 1) {
+            rangeWithDots.push("...");
+          }
+        }
+        rangeWithDots.push(i);
+        l = i;
+      }
+
+      return rangeWithDots;
+    },
   },
   methods: {
     async switchTab(tab) {
@@ -181,8 +315,7 @@ export default {
       await this.loadData();
     },
     async handleSearch() {
-      // Reset to first page if implementing pagination
-      if (this.currentPage) this.currentPage = 1;
+      this.currentPage = 1;
     },
     async loadData() {
       try {
@@ -279,6 +412,16 @@ export default {
           message: error.response?.data?.message || "Không thể từ chối yêu cầu",
         });
       }
+    },
+    handlePageChange(page) {
+      if (typeof page === "number" && page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+      }
+    },
+  },
+  watch: {
+    searchKeyword() {
+      this.currentPage = 1;
     },
   },
 };
@@ -400,5 +543,51 @@ export default {
 }
 .badge.bg-primary {
   background-color: #3b82f6 !important;
+}
+
+.pagination-wrapper {
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pagination {
+  margin: 0;
+}
+
+.page-link {
+  padding: 0.5rem 0.75rem;
+  color: #3b82f6;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  min-width: 38px;
+  text-align: center;
+}
+
+.page-link:hover {
+  background-color: #f1f5f9;
+  color: #2563eb;
+}
+
+.page-item.active .page-link {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.page-item.disabled .page-link {
+  color: #94a3b8;
+  pointer-events: none;
+  background-color: #fff;
+}
+
+.form-select {
+  border-color: #e2e8f0;
+  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+}
+
+.pagination-info {
+  color: #64748b;
+  font-size: 0.875rem;
 }
 </style>

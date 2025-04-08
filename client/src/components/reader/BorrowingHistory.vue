@@ -100,8 +100,8 @@
               <tr v-for="book in historyBooks" :key="book._id">
                 <td>{{ book.MaSach?.TenSach }}</td>
                 <td>{{ book.MaSach?.MaSach }}</td>
-                <td>{{ formatDate(book.NgayMuon) }}</td>
-                <td>{{ formatDate(book.NgayTra) }}</td>
+                <td>{{ formatDate(book.NgayMuon) || "/" }}</td>
+                <td>{{ formatDate(book.NgayTra) || "/" }}</td>
                 <td>
                   <span
                     class="badge"

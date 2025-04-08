@@ -103,6 +103,13 @@
                 ><i class="bi bi-calendar me-2"></i>Ngày sinh</label
               >
             </div>
+            <div v-if="isStaff" class="mb-3">
+              <p class="text-danger">
+                <i class="bi bi-info-circle me-2"></i>
+                Tính năng này để giúp người dùng trải nghiệm giao diện quản lý
+                trên thực tế sẽ được thiết kế cài đặt đặc biệt.
+              </p>
+            </div>
             <div class="alert alert-danger" v-if="error">
               <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
             </div>

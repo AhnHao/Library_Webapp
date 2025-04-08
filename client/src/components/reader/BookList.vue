@@ -22,7 +22,7 @@
 
     <!-- Book Grid -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-      <div v-for="book in books" :key="book._id" class="col">
+      <div v-for="book in paginatedBooks" :key="book._id" class="col">
         <div class="book-card">
           <div class="book-image">
             <img
@@ -77,6 +77,58 @@
         </div>
       </div>
     </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper mt-5">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="pagination-info">
+          Hiển thị {{ startIndex + 1 }}-{{ endIndex }} trong số
+          {{ filteredBooks.length }} quyển sách
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination mb-0">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="handlePageChange(currentPage - 1)"
+              >
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            </li>
+            <li
+              v-for="page in displayedPages"
+              :key="page"
+              class="page-item"
+              :class="{
+                active: currentPage === page,
+                disabled: page === '...',
+              }"
+            >
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="handlePageChange(page)"
+              >
+                {{ page }}
+              </a>
+            </li>
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="handlePageChange(currentPage + 1)"
+              >
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -90,11 +142,76 @@ export default {
       books: [],
       searchKeyword: "",
       borrowStatus: {},
+      currentPage: 1,
+      itemsPerPage: 12,
     };
   },
   async mounted() {
     await this.loadBooks();
     await this.loadBookStatus();
+  },
+  computed: {
+    filteredBooks() {
+      if (!this.searchKeyword.trim()) return this.books;
+
+      const keyword = this.searchKeyword.toLowerCase();
+      return this.books.filter((book) => {
+        return (
+          book.TenSach.toLowerCase().includes(keyword) ||
+          book.TacGia.toLowerCase().includes(keyword) ||
+          book.MaNXB?.TenNXB.toLowerCase().includes(keyword)
+        );
+      });
+    },
+    totalPages() {
+      return Math.ceil(this.filteredBooks.length / this.itemsPerPage);
+    },
+    startIndex() {
+      return (this.currentPage - 1) * this.itemsPerPage;
+    },
+    endIndex() {
+      return Math.min(
+        this.startIndex + this.itemsPerPage,
+        this.filteredBooks.length
+      );
+    },
+    paginatedBooks() {
+      return this.filteredBooks.slice(this.startIndex, this.endIndex);
+    },
+    displayedPages() {
+      const delta = 2;
+      const range = [];
+      const rangeWithDots = [];
+      let l;
+
+      range.push(1);
+
+      for (
+        let i = this.currentPage - delta;
+        i <= this.currentPage + delta;
+        i++
+      ) {
+        if (i < this.totalPages && i > 1) {
+          range.push(i);
+        }
+      }
+
+      range.push(this.totalPages);
+
+      for (let i of range) {
+        if (l) {
+          if (i - l === 2) {
+            rangeWithDots.push(l + 1);
+          } else if (i - l !== 1) {
+            rangeWithDots.push("...");
+          }
+        }
+        rangeWithDots.push(i);
+        l = i;
+      }
+
+      return rangeWithDots;
+    },
   },
   methods: {
     async loadBooks() {
@@ -134,11 +251,18 @@ export default {
       return {
         "bg-warning": status === "chờ duyệt",
         "bg-danger": status === "đang mượn",
-        "bg-success": !status,
+        "bg-secondary": this.getBookById(bookId)?.SoQuyen === 0,
+        "bg-success": !status && this.getBookById(bookId)?.SoQuyen > 0,
       };
     },
     getStatusText(bookId) {
       const status = this.borrowStatus[bookId];
+      const book = this.getBookById(bookId);
+
+      if (book?.SoQuyen === 0) {
+        return "Hết sách";
+      }
+
       switch (status) {
         case "đang mượn":
           return "Bạn đã mượn quyển sách này";
@@ -168,6 +292,7 @@ export default {
       }
     },
     async handleSearch() {
+      this.currentPage = 1; // Reset về trang đầu khi tìm kiếm
       if (this.searchKeyword.trim()) {
         try {
           const response = await api.searchBooks(this.searchKeyword);
@@ -186,13 +311,21 @@ export default {
       }).format(value);
     },
     isBookUnavailable(bookId) {
+      const book = this.getBookById(bookId);
       return (
         this.borrowStatus[bookId] === "đang mượn" ||
-        this.borrowStatus[bookId] === "chờ duyệt"
+        this.borrowStatus[bookId] === "chờ duyệt" ||
+        book?.SoQuyen === 0
       );
     },
     getBorrowButtonText(bookId) {
       const status = this.borrowStatus[bookId];
+      const book = this.getBookById(bookId);
+
+      if (book?.SoQuyen === 0) {
+        return "Hết sách";
+      }
+
       switch (status) {
         case "đang mượn":
           return "Đang mượn";
@@ -205,6 +338,20 @@ export default {
     handleImageError(e) {
       e.target.style.display = "none";
       e.target.nextElementSibling.style.display = "block";
+    },
+    getBookById(bookId) {
+      return this.books.find((book) => book._id === bookId);
+    },
+    handlePageChange(page) {
+      if (typeof page === "number" && page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    },
+  },
+  watch: {
+    searchKeyword() {
+      this.currentPage = 1; // Reset về trang đầu khi thay đổi từ khóa tìm kiếm
     },
   },
 };
@@ -272,8 +419,8 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  max-width: 350px; /* Giới hạn chiều rộng tối đa của card */
-  margin: 0 auto; /* Căn giữa card */
+  max-width: 350px;
+  margin: 0 auto;
 }
 
 .book-card:hover {
@@ -285,7 +432,7 @@ export default {
   background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   text-align: center;
   position: relative;
-  height: 300px; /* Tăng chiều cao */
+  height: 300px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -293,22 +440,22 @@ export default {
 }
 
 .book-cover {
-  width: 80%; /* Giảm width để tạo padding hai bên */
-  height: 90%; /* Giảm height để tạo padding trên dưới */
-  object-fit: contain; /* Đổi từ cover sang contain để hiển thị trọn ảnh */
+  width: 80%;
+  height: 90%;
+  object-fit: contain;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Căn giữa hoàn hảo */
-  padding: 1rem; /* Thêm padding xung quanh ảnh */
-  background: rgba(255, 255, 255, 0.1); /* Thêm background mờ */
-  border-radius: 0.5rem; /* Bo tròn nhẹ */
+  transform: translate(-50%, -50%);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
 }
 
 .book-image i {
-  font-size: 4rem; /* Tăng kích thước icon */
+  font-size: 4rem;
   color: white;
-  opacity: 0.8; /* Làm mờ nhẹ icon */
+  opacity: 0.8;
 }
 
 .book-info {
@@ -359,6 +506,11 @@ export default {
   font-weight: 500;
 }
 
+.status-badge.bg-secondary {
+  background-color: #6c757d !important;
+  color: white;
+}
+
 .book-action {
   padding: 1.5rem;
   background: #f8fafc;
@@ -381,8 +533,54 @@ export default {
 }
 
 .btn-borrow:disabled {
-  background: #e2e8f0;
+  background: #6c757d;
   cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.pagination-wrapper {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pagination {
+  margin: 0;
+}
+
+.page-link {
+  padding: 0.5rem 0.75rem;
+  color: #3b82f6;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  min-width: 38px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover {
+  background-color: #f1f5f9;
+  color: #2563eb;
+  border-color: #e2e8f0;
+}
+
+.page-item.active .page-link {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.page-item.disabled .page-link {
+  color: #94a3b8;
+  pointer-events: none;
+  background-color: white;
+}
+
+.pagination-info {
+  color: #64748b;
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {

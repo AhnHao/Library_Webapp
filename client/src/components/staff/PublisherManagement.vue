@@ -112,7 +112,10 @@
     <div class="modal fade" id="publisherModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header">
+          <div
+            class="modal-header"
+            style="border-radius: calc(0.5rem - (1px)) calc(0.5rem - (1px)) 0 0"
+          >
             <h5 class="modal-title">
               {{
                 isEditing ? "Chỉnh sửa nhà xuất bản" : "Thêm nhà xuất bản mới"
@@ -391,7 +394,7 @@ export default {
 }
 
 .search-input {
-  padding-left: 2.75rem;
+  padding-left: 2.75rem !important;
   height: 3rem;
   border-radius: 0.5rem;
   border: 1px solid #e2e8f0;
