@@ -41,9 +41,9 @@ pipeline {
       }
     }
 
-    stage('Clean Old Containers & Volumes') {
+    stage('Clean Old Containers') {
       steps {
-        sh 'docker-compose down -v || true'
+        sh 'docker-compose down || true'
       }
     }
 
