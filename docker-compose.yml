@@ -51,7 +51,7 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    command: certonly --webroot --webroot-path=/var/www/certbot --email your@email.com --agree-tos --no-eff-email -d haotrananh.id.vn -d www.haotrananh.id.vn
+    command: certonly --webroot --webroot-path=/var/www/certbot --email haotrananh2@gmail.com --agree-tos --no-eff-email -d haotrananh.id.vn -d www.haotrananh.id.vn
 
 networks:
   app-network:
