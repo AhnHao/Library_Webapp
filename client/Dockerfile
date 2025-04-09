@@ -6,22 +6,11 @@ COPY . .
 RUN npm run build
 
 FROM nginx:stable-alpine as production-stage
-# Install certbot
-RUN apk add --no-cache certbot certbot-nginx
-
-# Create necessary directories
-RUN mkdir -p /var/log/nginx
-RUN mkdir -p /var/www/certbot
-
-# Set permissions
-RUN chown -R nginx:nginx /var/log/nginx
-
-# Copy build files
+# Copy entire dist folder
 COPY --from=build-stage /app/dist /usr/share/nginx/html/
 
-# Copy nginx configuration
+# Ensure proper permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80 443
-
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
