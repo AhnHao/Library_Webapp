@@ -39,7 +39,6 @@ Lưu ý: Trong hệ thống sẽ có một số tính năng để cho người d
 - Express.js
 - MongoDB
 - JWT Authentication
-- Bcrypt
 
 ### DevOps
 
