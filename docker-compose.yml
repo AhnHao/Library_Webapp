@@ -28,6 +28,9 @@ services:
       - backend
     networks:
       - app-network
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/log/nginx:/var/log/nginx
 
   mongodb:
     image: mongo:latest
